@@ -30,8 +30,6 @@ function App() {
   };
 
   const returnToListing = (openFilters = false) => {
-    setFilters((currentFilters) => ({ ...currentFilters, categories: [] }));
-    setPage(1);
     if (openFilters) {
       setFiltersOpen(true);
     }
