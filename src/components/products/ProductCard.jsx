@@ -1,12 +1,13 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Star } from 'lucide-react';
 
 const ProductCard = ({ product }) => {
   const roundedRating = Math.round(product.rating);
+  const location = useLocation();
 
   return (
     <Link
-      to={`/product/${product.id}`}
+      to={{ pathname: `/product/${product.id}`, search: location.search }}
       className="group flex min-w-0 flex-col rounded-md border border-gray-200 bg-white p-3 shadow-sm transition hover:border-gray-300 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
       aria-label={`View ${product.title}, $${product.price.toFixed(2)}, rating ${product.rating} out of 5`}
     >

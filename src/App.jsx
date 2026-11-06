@@ -1,39 +1,94 @@
 import { useState } from 'react'
-import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
+import { Navigate, Route, Routes, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import './App.css'
 import ProductDetail from './pages/ProductDetail'
 import ProductListing from './pages/ProductListing'
 import Navbar from './components/common/Header'
 
-const initialFilters = {
-  search: '',
-  categories: [],
-  brands: [],
-  minPrice: null,
-  maxPrice: null,
-  topRatedOnly: false,
+const filterParamNames = ['search', 'category', 'brand', 'minPrice', 'maxPrice', 'rating'];
+
+const parsePrice = (value) => {
+  if (value === null || value === '') {
+    return null;
+  }
+
+  const price = Number(value);
+  return Number.isFinite(price) && price >= 0 ? price : null;
 };
 
+function readFilters(searchParams) {
+  return {
+    search: searchParams.get('search') ?? '',
+    categories: searchParams.getAll('category'),
+    brands: searchParams.getAll('brand'),
+    minPrice: parsePrice(searchParams.get('minPrice')),
+    maxPrice: parsePrice(searchParams.get('maxPrice')),
+    topRatedOnly: searchParams.get('rating') === '4',
+  };
+}
+
+function writeFilters(searchParams, filters) {
+  filterParamNames.forEach((name) => searchParams.delete(name));
+
+  if (filters.search) {
+    searchParams.set('search', filters.search);
+  }
+  filters.categories.forEach((category) => searchParams.append('category', category));
+  filters.brands.forEach((brand) => searchParams.append('brand', brand));
+
+  if (filters.minPrice !== null) {
+    searchParams.set('minPrice', String(filters.minPrice));
+  }
+  if (filters.maxPrice !== null) {
+    searchParams.set('maxPrice', String(filters.maxPrice));
+  }
+  if (filters.topRatedOnly) {
+    searchParams.set('rating', '4');
+  }
+
+  searchParams.delete('page');
+}
+
 function App() {
-  const [filters, setFilters] = useState(initialFilters);
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [page, setPage] = useState(1);
   const location = useLocation();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const filters = readFilters(searchParams);
+  const requestedPage = Number(searchParams.get('page'));
+  const page = Number.isSafeInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
+
+  const setPage = (nextPage) => {
+    const safePage = Number.isSafeInteger(nextPage) && nextPage > 0 ? nextPage : 1;
+    setSearchParams((currentParams) => {
+      const nextParams = new URLSearchParams(currentParams);
+      if (safePage === 1) {
+        nextParams.delete('page');
+      } else {
+        nextParams.set('page', String(safePage));
+      }
+      return nextParams;
+    }, { replace: true });
+  };
 
   const updateFilters = (nextFilters) => {
-    setFilters((currentFilters) => ({
-      ...currentFilters,
-      ...(typeof nextFilters === 'function' ? nextFilters(currentFilters) : nextFilters),
-    }));
-    setPage(1);
+    const updatedFilters = {
+      ...filters,
+      ...(typeof nextFilters === 'function' ? nextFilters(filters) : nextFilters),
+    };
+
+    setSearchParams((currentParams) => {
+      const nextParams = new URLSearchParams(currentParams);
+      writeFilters(nextParams, updatedFilters);
+      return nextParams;
+    }, { replace: true });
   };
 
   const returnToListing = (openFilters = false) => {
     if (openFilters) {
       setFiltersOpen(true);
     }
-    navigate('/');
+    navigate({ pathname: '/', search: location.search });
   };
 
   const handleMenuClick = () => {
@@ -61,7 +116,14 @@ function App() {
               <ProductListing
                 filters={filters}
                 onFiltersChange={updateFilters}
-                onResetFilters={() => updateFilters(initialFilters)}
+                onResetFilters={() => updateFilters({
+                  search: '',
+                  categories: [],
+                  brands: [],
+                  minPrice: null,
+                  maxPrice: null,
+                  topRatedOnly: false,
+                })}
                 isFilterOpen={filtersOpen}
                 onOpenFilters={() => setFiltersOpen(true)}
                 onCloseFilters={() => setFiltersOpen(false)}
