@@ -1,35 +1,29 @@
 # Leegality Product Explorer
 
-A responsive product listing and detail experience built with React, Vite, Tailwind CSS, and React Router using DummyJSON.
+I built this small product explorer as part of the Leegality frontend assessment. It uses DummyJSON to show a product catalogue, let people narrow it down, and open a separate page for each product.
 
-## Run locally
+## Run it locally
 
 ```sh
 npm install
 npm run dev
 ```
 
-Use `npm run lint` and `npm run build` to validate the project.
+To check the project, run `npm run lint` and `npm run build`.
 
-## Features
+## What I built
 
-- Loads the full product catalog and dynamic categories from DummyJSON.
-- Uses category endpoints when category checkboxes are selected.
-- Combines search, category, brand, price, and rating filters.
-- Paginates filtered results with eight products per page.
-- Loads product details by ID and keeps listing filters/page state when returning.
-- Includes loading, request error, retry, and empty-result states.
+The listing page has a responsive product grid and a filter sidebar. Search, category, brand, price, and rating filters work together. Categories come from DummyJSON, while the brand list is built from the products returned by the API. Product cards open `/product/:id`, where the app fetches and displays that product's details and images.
 
-## Architecture and assumptions
+I added pagination to both the product list and the detail-page image gallery. The current filters and page are kept in the URL, so refreshing the listing or returning from a product does not lose that state. The pages also show a loading state while data is being fetched, and provide an error/retry message or an empty-results message when needed.
 
-- `src/service/productApi.js` owns API requests and HTTP error handling.
-- `ProductListing` applies client-side search, brand, price, and rating filters; selected categories are fetched from the category endpoint.
-- Pagination is client-side after filtering. DummyJSON supports `limit=0`, which returns all 194 current products.
-- Category options come from `/products/categories`; brand options are unique non-empty brands in the loaded catalog.
-- Listing filters and page are kept in the app shell, so navigating to a product and back does not discard them.
+## A few implementation decisions
 
-## Further improvements
+- I load the full catalogue with `limit=0`, then filter and paginate it in the browser. That keeps filters working together without extra requests for each price, brand, or search change.
+- When a category is selected, I use DummyJSON's category endpoint. Category labels come from `/products/categories` rather than a hard-coded list.
+- I keep API calls in `src/service/productApi.js` so the pages do not need to know how HTTP errors are handled.
+- I use React Router for the listing and detail routes, and URL query parameters for the listing filters and page number.
 
-- Persist filters in the URL so they survive reloads and can be shared.
-- Add automated component and browser tests for filtering, pagination, and navigation.
-- Replace the demo cart, history, and profile controls with application flows.
+## If I had more time
+
+I would add automated tests for filter combinations, pagination, refreshes, and back navigation. I would also replace the header's demo cart, history, and profile buttons with working flows.
