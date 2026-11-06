@@ -136,7 +136,7 @@ function ProductListing({
           <aside
             id="product-filter-sidebar"
             aria-label="Product filters"
-            className="fixed inset-y-0 left-0 z-50 h-full w-[min(88vw,300px)] overflow-y-auto border-r border-gray-200 bg-white shadow-xl md:sticky md:top-[60px] md:z-10 md:h-[calc(100vh-60px)] md:w-auto md:shadow-none"
+            className="fixed inset-y-0 left-0 z-50 h-full w-[min(88vw,300px)] overflow-y-auto border-r border-gray-200 bg-white shadow-xl md:sticky md:top-15 md:z-10 md:h-[calc(100vh-60px)] md:w-auto md:shadow-none"
           >
             <ProductFilter
               categories={categories}

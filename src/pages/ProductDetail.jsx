@@ -57,12 +57,12 @@ const ProductDetail = ({ onBack }) => {
         <ErrorMessage message={error} onRetry={retry} />
       ) : product && (
         <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
-          <div className="flex min-h-[360px] flex-col border-b border-gray-100 pb-5 lg:min-h-[560px] lg:border-b-0 lg:border-r lg:pb-0 lg:pr-10">
+          <div className="flex min-h-90 flex-col border-b border-gray-100 pb-5 lg:min-h-140 lg:border-b-0 lg:border-r lg:pb-0 lg:pr-10">
             <div className="flex flex-1 items-center justify-center py-4">
               <img
                 src={product.images?.[imagePage - 1] || product.thumbnail}
                 alt={`${product.title} image ${imagePage}`}
-                className="max-h-[480px] w-full object-contain"
+                className="max-h-120 w-full object-contain"
               />
             </div>
             <div className="pt-4">
